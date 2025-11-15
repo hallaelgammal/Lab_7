@@ -44,7 +44,7 @@ public class LessonManager {
         }
 
         @Override
-        public String toString() {
+        public String toString() { //3shan lama agy a3ml print
             return id + ": " + title + " - " + content;
         }
     }
