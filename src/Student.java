@@ -18,7 +18,7 @@ public class Student extends User {
     // constructor ashan loading from json files
     public Student(String userId, String username, String email, String passwordHash, ArrayList<Integer> enrolledCourses, HashMap<Integer, ArrayList<String>> progress)
     { 
-        super(userId, "student", username, email, passwordHash);
+        super(userId,Role.STUDENT, username, email, passwordHash);
         // to protect from null values
     this.enrolledCourses = (enrolledCourses != null) ? enrolledCourses : new ArrayList<>();
     this.progress = (progress != null) ? progress : new HashMap<>();
@@ -26,7 +26,7 @@ public class Student extends User {
     }
     // constructor for new students wa2t signing up
      public Student(String userId, String username, String email, String passwordHash) {
-        super(userId, "student", username, email, passwordHash);
+        super(userId,Role.STUDENT, username, email, passwordHash);
         this.enrolledCourses = new ArrayList<>();
         this.progress = new HashMap<>();
     }
