@@ -32,7 +32,7 @@ public class AuthManager {
         if (database.findUserByEmail(email) != null) {
             return new AuthResult(false, "Email already exists");
         }
-        Role role=Role.formString(roleStr);
+        Role role=Role.fromString(roleStr);
         if(role==null)
         {
           return new AuthResult(false, "Invalid role.Must be STUDENT or INSTRUCTOR");  
