@@ -9,12 +9,12 @@
  */
 public abstract class User {
     protected String userId;
-    protected String role;
+    protected Role role;
     protected String username;
     protected String email;
     protected String passwordHash;
 
-    public User(String userId, String role, String userName, String email, String passwordHash) {
+    public User(String userId, Role role, String userName, String email, String passwordHash) {
         this.userId = userId;
         this.role = role;
         this.username = userName;
@@ -26,7 +26,7 @@ public abstract class User {
         return userId;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
