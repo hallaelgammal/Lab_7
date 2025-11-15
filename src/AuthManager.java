@@ -22,7 +22,7 @@ public class AuthManager {
  public void logout() {
  
     }
-    public AuthResult signup(String username, String email, String password,String role) {
+    public AuthResult signup(String username, String email, String password,String roleStr) {
         if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
             return new AuthResult(false, "All fields are required");
         }
@@ -32,18 +32,26 @@ public class AuthManager {
         if (database.findUserByEmail(email) != null) {
             return new AuthResult(false, "Email already exists");
         }
+        Role role=Role.formString(roleStr);
+        if(role==null)
+        {
+          return new AuthResult(false, "Invalid role.Must be STUDENT or INSTRUCTOR");  
+        }
         String hashed = PasswordUtil.hash(password);
-       String id = UUID.randomUUID().toString();
+       String id = UUID.randomUUID().toString();//universary unique identifier creates new unigue id every time 
        User newUser;
-    if (role.equalsIgnoreCase("student")) {
-        newUser = new Student(id, username, email, hashed);
-    } else if(role.equalsIgnoreCase("instructor")) {
-        newUser = new Instructor(id, username, email, hashed);
-    }
-    else
-        return new AuthResult(false, "Invalid role");
+       switch(role){
+           case STUDENT:
+               newUser=new Student(id,username,email,hashed);
+               break;
+           case INSTRUCTOR:
+               newUser=new Instructor(id,username,email,hashed);
+               break;
+           default:
+               return new AuthResult(false, "Invalid role");
+       }
     database.saveUser(newUser);
-        return new AuthResult(true, "Signup successful", newStudent);
+        return new AuthResult(true, "Signup successful", newUser);
     }
 
 }
