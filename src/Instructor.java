@@ -16,6 +16,12 @@ public class Instructor extends User {
         this.createdCourses = (createdCourses != null) ? createdCourses : new ArrayList<>();
         this.createdLessons = new ArrayList<>();
     }
+// Constructor for new instructors 
+public Instructor(String userId, String username, String email, String passwordHash) {
+    super(userId, Role.INSTRUCTOR, username, email, passwordHash);
+    this.createdCourses = new ArrayList<>();
+    this.createdLessons = new ArrayList<>();
+}
 
     public int addCourse(CourseManager manager, String title, String description) {
         CourseManager.Course course = manager.addCourse(title, description);
