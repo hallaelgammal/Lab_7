@@ -6,8 +6,9 @@
 import java.util.ArrayList;
 
 public class Instructor extends User {
-    private ArrayList<Integer> createdCourses; // store IDs of courses created by this instructor
-    private ArrayList<Integer> createdLessons; // store IDs of lessons created by this instructor
+
+    private ArrayList<Integer> createdCourses; // IDs of courses this instructor created
+    private ArrayList<Integer> createdLessons; // IDs of lessons this instructor created
 
     // Constructor
     public Instructor(String userId, String username, String email, String passwordHash, ArrayList<Integer> createdCourses) {
@@ -22,7 +23,7 @@ public class Instructor extends User {
             createdCourses.add(course.getId());
             return course.getId();
         }
-        return -1; // failed to create course
+        return -1;
     }
 
     public boolean editCourse(CourseManager manager, int courseId, String newTitle, String newDescription) {
@@ -37,33 +38,30 @@ public class Instructor extends User {
         return deleted;
     }
 
-    public int addLesson(LessonManager manager, int courseId, String title, String content, String[] resources) {
-        LessonManager.Lesson lesson = manager.addLesson(courseId, title, content, resources);
+    public int addLesson(LessonManager manager, int courseId, String title, String content) {
+        if (!createdCourses.contains(courseId)) return -1; // can only add lessons to own courses
+        LessonManager.Lesson lesson = manager.addLesson(courseId, title, content);
         if (lesson != null) {
-            createdLessons.add(lesson.getLessonId());
-            return lesson.getLessonId();
+            createdLessons.add(lesson.getId());
+            return lesson.getId();
         }
-        return -1; // failed to create lesson
+        return -1;
     }
 
-    public boolean editLesson(LessonManager manager, int lessonId, String newTitle, String newContent, String[] newResources) {
+    public boolean editLesson(LessonManager manager, int courseId, int lessonId, String newTitle, String newContent) {
         if (!createdLessons.contains(lessonId)) return false;
-        return manager.editLesson(lessonId, newTitle, newContent, newResources);
+        return manager.editLesson(courseId, lessonId, newTitle, newContent);
     }
 
-    public boolean deleteLesson(LessonManager manager, int lessonId) {
+    public boolean deleteLesson(LessonManager manager, int courseId, int lessonId) {
         if (!createdLessons.contains(lessonId)) return false;
-        boolean deleted = manager.deleteLesson(lessonId);
+        boolean deleted = manager.deleteLesson(courseId, lessonId);
         if (deleted) createdLessons.remove(Integer.valueOf(lessonId));
         return deleted;
     }
 
-    // -------------------
-    // View Enrolled Students
-    // -------------------
-
     public ArrayList<String> viewEnrolledStudents(CourseManager manager, int courseId) {
-        if (!createdCourses.contains(courseId)) return null; // can only view students for own courses
+        if (!createdCourses.contains(courseId)) return null;
         CourseManager.Course course = manager.getCourse(courseId);
         if (course != null) return course.getEnrolledStudents();
         return null;
