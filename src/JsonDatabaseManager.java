@@ -7,29 +7,33 @@
  *
  * @author Abdallah
  */
-
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.util.*;
+
 public class JsonDatabaseManager {
+
     private static final String USERS_FILE = "users.json";
     private static final String COURSES_FILE = "courses.json";
 
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<CourseManager> courses = new ArrayList<>();
+
     // constructor loads everything 
-     public JsonDatabaseManager() {
+    public JsonDatabaseManager() {
         loadUsers();
         loadCourses();
     }
-     // read json files w bet return as a string 
-     private String readFile(String filename) {
+    // read json files w bet return as a string 
+
+    private String readFile(String filename) {
         try {
             File f = new File(filename);
-            if (!f.exists()) return "[]";
+            if (!f.exists()) {
+                return "[]";
+            }
 
             BufferedReader br = new BufferedReader(new FileReader(f));
             StringBuilder sb = new StringBuilder();
@@ -47,8 +51,9 @@ public class JsonDatabaseManager {
             return "[]";
         }
     }
-     //write string to json 
-      private void writeFile(String filename, String data) {
+    //write string to json 
+
+    private void writeFile(String filename, String data) {
         try {
             FileWriter fw = new FileWriter(filename);
             fw.write(data);
@@ -57,7 +62,8 @@ public class JsonDatabaseManager {
             e.printStackTrace();
         }
     }
-      private void loadUsers() {
+
+    private void loadUsers() {
         users.clear();
 
         JSONArray arr = new JSONArray(readFile(USERS_FILE));
@@ -95,9 +101,7 @@ public class JsonDatabaseManager {
                 }
 
                 users.add(new Student(userId, username, email, passwordHash, enrolled, progress));
-            }
-
-            else if (role.equals("instructor")) {
+            } else if (role.equals("instructor")) {
 
                 ArrayList<Integer> created = new ArrayList<>();
                 JSONArray createdArr = obj.getJSONArray("createdCourses");
@@ -109,14 +113,15 @@ public class JsonDatabaseManager {
             }
         }
     }
-      public void saveUsers() {
+
+    public void saveUsers() {
         JSONArray arr = new JSONArray();
 
         for (User u : users) {
             JSONObject obj = new JSONObject();
 
             obj.put("userId", u.getUserId());
-            obj.put("role", u.getRole());
+            obj.put("role", u.getRole().toString().toLowerCase());
             obj.put("username", u.getUsername());
             obj.put("email", u.getEmail());
             obj.put("passwordHash", u.getPasswordHash());
@@ -143,8 +148,12 @@ public class JsonDatabaseManager {
         writeFile(USERS_FILE, arr.toString(4));
     }
 
-      
-      private void loadCourses() {
+    public void saveUser(User u) {
+        users.add(u);
+        saveUsers();
+    }
+
+    private void loadCourses() {
         courses.clear();
 
         JSONArray arr = new JSONArray(readFile(COURSES_FILE));
@@ -181,7 +190,8 @@ public class JsonDatabaseManager {
             courses.add(c);
         }
     }
-      public void saveCourses() {
+
+    public void saveCourses() {
         JSONArray arr = new JSONArray();
 
         for (Course c : courses) {
@@ -210,35 +220,41 @@ public class JsonDatabaseManager {
 
         writeFile(COURSES_FILE, arr.toString(4));
     }
-      
-      
-      public ArrayList<User> getUsers() { return users; }
-    public ArrayList<CourseManager> getCourses() { return courses; }
+
+    public ArrayList<User> getUsers() {
+        return users;
+    }
+
+    public ArrayList<CourseManager> getCourses() {
+        return courses;
+    }
 
     public int generateUserId() {
         int max = 0;
-        
-    for (User u : users) {
-        try {
-            // convert string userId to int safely
-            int id = Integer.parseInt(String.valueOf(u.getUserId()));
 
-            if (id > max) {
-                max = id;
+        for (User u : users) {
+            try {
+                // convert string userId to int safely
+                int id = Integer.parseInt(String.valueOf(u.getUserId()));
+
+                if (id > max) {
+                    max = id;
+                }
+            } catch (Exception e) {
+                // if something goes wrong, skip this ID
+                System.out.println("Invalid userId format: " + u.getUserId());
             }
-        } catch (Exception e) {
-            // if something goes wrong, skip this ID
-            System.out.println("Invalid userId format: " + u.getUserId());
         }
-    }
 
-    return max + 1;
+        return max + 1;
     }
 
     public int generateCourseId() {
         int max = 0;
         for (CourseManager c : courses) {
-            if (c.getId() > max) max = c.getId();
+            if (c.getId() > max) {
+                max = c.getId();
+            }
         }
         return max + 1;
     }
@@ -253,7 +269,13 @@ public class JsonDatabaseManager {
         saveCourses();
     }
 
+    public User findUserByEmail(String email) {
+        for (User u : users) {
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                return u;
+            }
+        }
+        return null;
+    }
 
-      
-   
 }
