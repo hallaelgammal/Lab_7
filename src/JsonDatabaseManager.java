@@ -103,10 +103,10 @@ public class JsonDatabaseManager {
                 users.add(new Student(userId, username, email, passwordHash, enrolled, progress));
             } else if (role.equals("instructor")) {
 
-                ArrayList<Integer> created = new ArrayList<>();
+                ArrayList<String> created = new ArrayList<>();
                 JSONArray createdArr = obj.getJSONArray("createdCourses");
                 for (int j = 0; j < createdArr.length(); j++) {
-                    created.add(createdArr.getInt(j));
+                    created.add(createdArr.getString(j));
                 }
 
                 users.add(new Instructor(userId, username, email, passwordHash, created));
