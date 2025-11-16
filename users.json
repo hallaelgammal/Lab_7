@@ -16,5 +16,13 @@
         "email": "hallaayman@gmail",
         "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
         "username": "hallaayman"
+    },
+    {
+        "role": "instructor",
+        "createdCourses": [],
+        "userId": "b05a0587-3cd3-4cf7-a352-347082c697af",
+        "email": "h@gmail.com",
+        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "username": "habiba"
     }
 ]

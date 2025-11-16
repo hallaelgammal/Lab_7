@@ -13,10 +13,12 @@ import javax.swing.table.DefaultTableModel;
  */
 public class InstructorLessonsFrame extends javax.swing.JFrame {
 private JsonDatabaseManager dbManager = new JsonDatabaseManager();
-private LessonManager lessonManager = new LessonManager();
-private CourseManager courseManager; 
+private LessonManager lessonManager = new LessonManager(); 
 private Course selectedCourse=null; // Set this when opening the frame
 private DefaultTableModel tableModel;
+private Instructor instructor;
+
+
 
     /**
      * Creates new form InstructorLessonsFrame
@@ -27,23 +29,30 @@ private DefaultTableModel tableModel;
 }
  
 private void loadLessons(String courseId) {
-    // 1. Find the course using CourseManager
-    selectedCourse = courseManager.getCourse(courseId);
+    // 1️⃣ Find the course in dbManager
+    selectedCourse = null;
+    for (Course c : dbManager.getCourses()) {
+        if (c.getCourseId().equals(courseId)) {
+            selectedCourse = c;
+            break;
+        }
+    }
 
     if (selectedCourse == null) {
         JOptionPane.showMessageDialog(this, "Course not found!");
         return;
     }
 
-    // 2. Clear your table first (if using JTable)
+    // 2️⃣ Clear the table
     DefaultTableModel model = (DefaultTableModel) LessonsTable.getModel();
     model.setRowCount(0);
 
-    // 3. Populate table with lessons
+    // 3️⃣ Populate table with lessons
     for (Lesson lesson : selectedCourse.getLessons()) {
         model.addRow(new Object[]{lesson.getLessonId(), lesson.getTitle(), lesson.getContent()});
     }
 }
+
 
 
 
@@ -116,6 +125,11 @@ private void loadLessons(String courseId) {
         });
 
         BackButton.setText("Back");
+        BackButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BackButtonActionPerformed(evt);
+            }
+        });
 
         txtCourseId.setText("Enter Course ID");
         txtCourseId.addActionListener(new java.awt.event.ActionListener() {
@@ -279,24 +293,57 @@ if (row >= 0) {
     }//GEN-LAST:event_txtCourseIdActionPerformed
 
     private void LoadLessonsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadLessonsButtonActionPerformed
-       String courseId = txtCourseId.getText().trim();
-if (courseId.isEmpty()) {
-    javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Course ID.");
-    return;
-}
+      // 1️⃣ Get the course ID from the text field
+    String courseId = txtCourseId.getText().trim();
+    
+    if (courseId.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please enter a Course ID.");
+        return;
+    }
 
-// Find the course by ID using CourseManager or add a method in dbManager
-selectedCourse = courseManager.getCourse(courseId); // Use CourseManager
+    // 2️⃣ Find the course in dbManager
+    selectedCourse = null;
+    for (Course c : dbManager.getCourses()) {
+        if (c.getCourseId().equals(courseId)) {
+            selectedCourse = c;
+            break;
+        }
+    }
 
-if (selectedCourse == null) {
-    javax.swing.JOptionPane.showMessageDialog(this, "Course not found.");
-    tableModel.setRowCount(0); // clear table
-    return;
-}
+    if (selectedCourse == null) {
+        JOptionPane.showMessageDialog(this, "Course not found.");
+        tableModel.setRowCount(0); // clear the table
+        return;
+    }
 
-// Load lessons into table
-loadLessons(selectedCourse.getCourseId());
+    // 3️⃣ Clear the table first
+    tableModel.setRowCount(0);
+
+    // 4️⃣ Populate table with lessons
+    for (Lesson lesson : selectedCourse.getLessons()) {
+        tableModel.addRow(new Object[]{
+            lesson.getLessonId(),
+            lesson.getTitle(),
+            lesson.getContent()
+        });
+    }
+    // Add extra rows for new lessons
+addExtraRows(5); // or any number of extra rows
     }//GEN-LAST:event_LoadLessonsButtonActionPerformed
+private void addExtraRows(int extraRows) {
+    for (int i = 0; i < extraRows; i++) {
+        tableModel.addRow(new Object[]{"", "", ""}); // ID blank for new lessons
+    }
+}
+
+    private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
+          // Close current frame
+    this.dispose();
+
+    // Open Instructor Dashboard
+    InstructorDashboardFrame dashboard = new InstructorDashboardFrame(instructor);
+    dashboard.setVisible(true);
+    }//GEN-LAST:event_BackButtonActionPerformed
 
     /**
      * @param args the command line arguments

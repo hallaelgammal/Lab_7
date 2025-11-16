@@ -8,13 +8,13 @@
         "lessons": [
             {
                 "lessonId": "L1",
-                "title": "What is Java?",
+                "title": "What is habiba",
                 "content": "Java introduction."
             },
             {
                 "lessonId": "L2",
-                "title": "Variables",
-                "content": "Types and variables."
+                "title": "New Lesson",
+                "content": ""
             }
         ]
     },

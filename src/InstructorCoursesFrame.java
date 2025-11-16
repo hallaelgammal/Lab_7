@@ -26,31 +26,34 @@ private Instructor instructor;
 
 public InstructorCoursesFrame(User user) {
     initComponents();
-if (user instanceof Instructor) {
-            this.instructor = (Instructor) user;
-        } else {
-            JOptionPane.showMessageDialog(this, "Error: Logged-in user is not a instructor!");
-            dispose();
-            return;
-        }
-    // 1️⃣ Initialize table model
+
+    if (user instanceof Instructor) {
+        this.instructor = (Instructor) user;
+    } else {
+        JOptionPane.showMessageDialog(this, "Error: Logged-in user is not an instructor!");
+        dispose();
+        return;
+    }
+
+    // Initialize table model after initComponents
     tableModel = (DefaultTableModel) CoursesTable.getModel();
 
-    // Only set column identifiers if table has no columns yet
+    // Optional: only set columns if table has none
     if (tableModel.getColumnCount() == 0) {
         tableModel.setColumnIdentifiers(new String[]{"Course ID", "Title", "Description"});
     }
 
-    // 2️⃣ Add TableModelListener to detect edits
+    // Add listener to detect edits
     tableModel.addTableModelListener(e -> {
         if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
             int row = e.getFirstRow();
             int col = e.getColumn();
 
-            String courseId = tableModel.getValueAt(row, 0).toString();
-            String newValue = tableModel.getValueAt(row, col).toString();
+            DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
+            String courseId = model.getValueAt(row, 0).toString();
+            String newValue = model.getValueAt(row, col).toString();
 
-            // Update the course in JsonDatabaseManager
+            // Update backend
             for (Course c : dbManager.getCourses()) {
                 if (c.getCourseId().equals(courseId)) {
                     if (col == 1) c.setTitle(newValue);
@@ -62,18 +65,27 @@ if (user instanceof Instructor) {
         }
     });
 
-    // 3️⃣ Load courses into the table
-    loadCourses(instructor);
+   dbManager = new JsonDatabaseManager();
+loadCourses(instructor);
+
 }
 
-private void loadCourses(Instructor user) {
-    tableModel.setRowCount(0); // clear table
+
+private void loadCourses(Instructor instructor) {
+    DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
+    model.setRowCount(0);  // Clear table first
+
     for (Course c : dbManager.getCourses()) {
-        if (c.getInstructorId().equals(user.getUserId())) {
-            tableModel.addRow(new Object[]{c.getCourseId(), c.getTitle(), c.getDescription()});
+        if (c.getInstructorId().equals(instructor.getUserId())) {
+            model.addRow(new Object[]{
+                c.getCourseId(),
+                c.getTitle(),
+                c.getDescription()
+            });
         }
     }
 }
+
 
 
 
@@ -199,14 +211,22 @@ private void loadCourses(Instructor user) {
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void CoursesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CoursesTableMouseClicked
-        int row = CoursesTable.getSelectedRow();
+       int row = CoursesTable.getSelectedRow();
 if (row >= 0) {
-    String courseId = tableModel.getValueAt(row, 0).toString();
-    String title = tableModel.getValueAt(row, 1).toString();
-    String desc = tableModel.getValueAt(row, 2).toString();
-    
+    // Get the table model directly from the JTable
+    DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
+
+    // Retrieve values safely
+    String courseId = model.getValueAt(row, 0).toString();
+    String title = model.getValueAt(row, 1).toString();
+    String desc = model.getValueAt(row, 2).toString();
+
     // Optionally, show details in text fields if you have them
+    // txtCourseId.setText(courseId);
+    // txtTitle.setText(title);
+    // txtDescription.setText(desc);
 }
+
     }//GEN-LAST:event_CoursesTableMouseClicked
 
     private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
