@@ -1,58 +1,85 @@
 
-import java.util.ArrayList;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
-
-/**
- *
- * @author Gehad
- */
 public class InstructorViewStudentsFrame extends javax.swing.JFrame {
-private JsonDatabaseManager dbManager;
+
+    private JsonDatabaseManager dbManager;
 
     /**
-     * Creates new form ViewStudents
+     * Creates new form InstructorViewStudentsFrame
      */
     public InstructorViewStudentsFrame() {
-       dbManager = new JsonDatabaseManager(); // create backend instance
-        initComponents();                      // NetBeans Design tab setup
-        ViewStudents();
-    }
-private void ViewStudents() {
-    DefaultTableModel model = (DefaultTableModel) tblStudents.getModel();
-    model.setRowCount(0); // clear table
+        // Initialize database manager
+        dbManager = new JsonDatabaseManager();
 
-    ArrayList<User> allUsers = dbManager.getUsers(); // get all users
+        // Initialize UI components from Design tab
+        initComponents();
+
+        // Optional: set column identifiers if not set in Design tab
+        DefaultTableModel model = (DefaultTableModel) tblStudents.getModel();
+        if (model.getColumnCount() == 0) {
+            model.setColumnIdentifiers(new String[]{"Student ID", "Username", "Email", "Course Title"});
+        }
+
+        // Load students into the table
+        loadStudents();
+    }
+
+    /**
+     * Loads all students and their enrolled courses into the table
+     */
+    private void loadStudents() {
+    DefaultTableModel model = (DefaultTableModel) tblStudents.getModel();
+    model.setRowCount(0); // Clear existing rows
+
+    ArrayList<User> allUsers = dbManager.getUsers(); // Get all users
+    ArrayList<Course> allCourses = dbManager.getCourses(); // Get all courses
 
     for (User u : allUsers) {
         if (u instanceof Student student) {
-            for (int courseId : student.getEnrolledCourses()) {
-                Course course = null;
-                for (Course c : dbManager.getCourses()) {
-                    try {
-                        if (Integer.parseInt(c.getCourseId().replaceAll("\\D", "")) == courseId) {
-                            course = c;
-                            break;
-                        }
-                    } catch (Exception e) {}
+            ArrayList<Integer> enrolledCourses = student.getEnrolledCourses();
+
+            String coursesString;
+            if (enrolledCourses.isEmpty()) {
+                coursesString = "Not enrolled";
+            } else {
+                // Collect all course titles into a single string separated by commas
+                StringBuilder sb = new StringBuilder();
+                for (Integer courseId : enrolledCourses) {
+                    Course course = allCourses.stream()
+                            .filter(c -> {
+                                try {
+                                    int cId = Integer.parseInt(c.getCourseId().replaceAll("\\D", ""));
+                                    return cId == courseId;
+                                } catch (Exception e) {
+                                    return false;
+                                }
+                            })
+                            .findFirst()
+                            .orElse(null);
+
+                    if (course != null) {
+                        if (sb.length() > 0) sb.append(", ");
+                        sb.append(course.getTitle());
+                    }
                 }
 
-                if (course != null) {
-                    model.addRow(new Object[]{
-                        student.getUserId(),
-                        student.getUsername(),
-                        student.getEmail(),
-                        course.getTitle()
-                    });
-                }
+                coursesString = (sb.length() > 0) ? sb.toString() : "Unknown course";
             }
+
+            // Add **only one row per student**
+            model.addRow(new Object[]{
+                    student.getUserId(),
+                    student.getUsername(),
+                    student.getEmail(),
+                    coursesString
+            });
         }
     }
 }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

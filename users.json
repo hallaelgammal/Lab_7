@@ -3,43 +3,59 @@
         "role": "student",
         "enrolledCourses": [],
         "progress": {},
-        "userId": "dccf534e-5fe8-4e91-a7f3-fdc66ca8080b",
-        "email": "halla@gmail",
-        "passwordHash": "7c302b703fe750c414e13239c7eef255f1b0d4417699249f3837de7f14a6a301",
-        "username": "halla"
-    },
-    {
-        "role": "student",
-        "enrolledCourses": [],
-        "progress": {},
-        "userId": "0ee063e9-d625-4299-be65-1816b4b361c6",
-        "email": "hallaayman@gmail",
-        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-        "username": "hallaayman"
-    },
-    {
-        "role": "instructor",
-        "createdCourses": [],
-        "userId": "b05a0587-3cd3-4cf7-a352-347082c697af",
-        "email": "h@gmail.com",
-        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-        "username": "habiba"
-    },
-    {
-        "role": "student",
-        "enrolledCourses": [],
-        "progress": {},
-        "userId": "ed79ad0c-f9fd-4d35-b2a4-3f40c5ead62a",
+        "userId": "S1",
         "email": "hana.gamaleldin@gmail.com",
         "passwordHash": "b71464bef9ba1d30fe7ba0e76ce946b02c6154eba5413cb4ad151154fb50ee07",
         "username": "Hana Gamaleldin"
     },
     {
+        "role": "student",
+        "enrolledCourses": [
+            1,
+            2
+        ],
+        "progress": {
+            "1": [
+                "L1",
+                "L2"
+            ],
+            "2": ["L1"]
+        },
+        "userId": "S2",
+        "email": "bob@example.com",
+        "passwordHash": "hashedpassword2",
+        "username": "Bob"
+    },
+    {
+        "role": "instructor",
+        "createdCourses": ["C1"],
+        "userId": "I1",
+        "email": "smith@example.com",
+        "passwordHash": "hashedpassword3",
+        "username": "Dr. Smith"
+    },
+    {
+        "role": "instructor",
+        "createdCourses": ["C2"],
+        "userId": "I2",
+        "email": "johnson@example.com",
+        "passwordHash": "hashedpassword4",
+        "username": "Prof. Johnson"
+    },
+    {
         "role": "instructor",
         "createdCourses": [],
-        "userId": "2d1ff15b-97fc-43bd-829d-fe0c1c7ade11",
-        "email": "hana@ahmed",
-        "passwordHash": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
-        "username": "hana ahmed"
+        "userId": "I3",
+        "email": "habiba@example.com",
+        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "username": "Habiba"
+    },
+    {
+        "role": "instructor",
+        "createdCourses": [],
+        "userId": "3a030eae-8b1e-4913-a0b9-6302763dfb36",
+        "email": "h@gmail.com",
+        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "username": "bibaa"
     }
 ]
