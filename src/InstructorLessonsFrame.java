@@ -1,4 +1,5 @@
 
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -13,29 +14,37 @@ import javax.swing.table.DefaultTableModel;
 public class InstructorLessonsFrame extends javax.swing.JFrame {
 private JsonDatabaseManager dbManager = new JsonDatabaseManager();
 private LessonManager lessonManager = new LessonManager();
-private Course selectedCourse; // Set this when opening the frame
+private CourseManager courseManager; 
+private Course selectedCourse=null; // Set this when opening the frame
 private DefaultTableModel tableModel;
 
     /**
      * Creates new form InstructorLessonsFrame
      */
-    public InstructorLessonsFrame(Course course) {
+    public InstructorLessonsFrame() {
     initComponents();
-    this.selectedCourse = course;
     tableModel = (DefaultTableModel) LessonsTable.getModel();
-    loadLessons();
 }
-  public InstructorLessonsFrame() {
-    initComponents();
-    this.selectedCourse = null;
-}  
-private void loadLessons() {
-    tableModel.setRowCount(0); // clear table
-    for (Lesson l : selectedCourse.getLessons()) {
-        tableModel.addRow(new Object[]{l.getLessonId(), l.getTitle(), l.getContent()});
+ 
+private void loadLessons(String courseId) {
+    // 1. Find the course using CourseManager
+    selectedCourse = courseManager.getCourse(courseId);
+
+    if (selectedCourse == null) {
+        JOptionPane.showMessageDialog(this, "Course not found!");
+        return;
     }
-    
+
+    // 2. Clear your table first (if using JTable)
+    DefaultTableModel model = (DefaultTableModel) LessonsTable.getModel();
+    model.setRowCount(0);
+
+    // 3. Populate table with lessons
+    for (Lesson lesson : selectedCourse.getLessons()) {
+        model.addRow(new Object[]{lesson.getLessonId(), lesson.getTitle(), lesson.getContent()});
+    }
 }
+
 
 
     /**
@@ -55,6 +64,8 @@ private void loadLessons() {
         UpdateButton = new javax.swing.JButton();
         DeleteButton = new javax.swing.JButton();
         BackButton = new javax.swing.JButton();
+        txtCourseId = new javax.swing.JTextField();
+        LoadLessonsButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -106,19 +117,30 @@ private void loadLessons() {
 
         BackButton.setText("Back");
 
+        txtCourseId.setText("Enter Course ID");
+        txtCourseId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCourseIdActionPerformed(evt);
+            }
+        });
+
+        LoadLessonsButton.setText("Load Lessons");
+        LoadLessonsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LoadLessonsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -130,15 +152,27 @@ private void loadLessons() {
                         .addComponent(DeleteButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(BackButton)
-                        .addGap(31, 31, 31))))
+                        .addGap(31, 31, 31))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtCourseId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(LoadLessonsButton)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 519, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtCourseId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(LoadLessonsButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CreateButton)
                     .addComponent(UpdateButton)
@@ -153,44 +187,116 @@ private void loadLessons() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
-       // Generate a new ID
-    Lesson lesson = lessonManager.addLesson(selectedCourse, "New Lesson", "");
-    if (lesson != null) {
-        dbManager.saveCourses();
-        loadLessons();
-    }
+      if (selectedCourse == null) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Please load a course first.");
+    return;
+}
+
+// Generate a new lesson ID (e.g., L1, L2, etc.)
+int maxId = 0;
+for (Lesson l : selectedCourse.getLessons()) {
+    try {
+        int id = Integer.parseInt(l.getLessonId().replaceAll("\\D", ""));
+        if (id > maxId) maxId = id;
+    } catch (Exception e) {}
+}
+String newLessonId = "L" + (maxId + 1);
+
+// Create the new lesson
+Lesson lesson = new Lesson(newLessonId, "New Lesson", "");
+selectedCourse.addLesson(lesson);
+
+// Save changes and reload table
+dbManager.saveCourses();
+loadLessons(selectedCourse.getCourseId());
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
-         int row = LessonsTable.getSelectedRow();
-    if (row >= 0) {
-        String lessonId = tableModel.getValueAt(row, 0).toString();
-        lessonManager.deleteLesson(selectedCourse, lessonId);
-        dbManager.saveCourses();
-        loadLessons();
+        if (selectedCourse == null) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Please load a course first.");
+    return;
+}
+
+int row = LessonsTable.getSelectedRow();
+if (row >= 0) {
+    String lessonId = tableModel.getValueAt(row, 0).toString();
+
+    // Delete lesson directly from selectedCourse
+    boolean deleted = selectedCourse.deleteLesson(lessonId);
+
+    if (deleted) {
+        dbManager.saveCourses();   // save changes
+        loadLessons(selectedCourse.getCourseId());  // reload table with the current course
+        javax.swing.JOptionPane.showMessageDialog(this, "Lesson deleted successfully.");
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Failed to delete lesson.");
     }
+} else {
+    javax.swing.JOptionPane.showMessageDialog(this, "Select a lesson to delete.");
+}
+
     }//GEN-LAST:event_DeleteButtonActionPerformed
 
     private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
-         int row = LessonsTable.getSelectedRow();
-    if (row >= 0) {
-        String lessonId = tableModel.getValueAt(row, 0).toString();
-        String newTitle = tableModel.getValueAt(row, 1).toString();
-        String newContent = tableModel.getValueAt(row, 2).toString();
+        if (selectedCourse == null) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Please load a course first.");
+    return;
+}
 
-        boolean success = lessonManager.editLesson(selectedCourse, lessonId, newTitle, newContent);
+int row = LessonsTable.getSelectedRow();
+if (row >= 0) {
+    String lessonId = tableModel.getValueAt(row, 0).toString();
+    String newTitle = tableModel.getValueAt(row, 1).toString();
+    String newContent = tableModel.getValueAt(row, 2).toString();
 
-        if (success) {
-            dbManager.saveCourses();
-            loadLessons();
-            javax.swing.JOptionPane.showMessageDialog(this, "Lesson updated successfully!");
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Failed to update lesson.");
+    // Find lesson in the selected course
+    Lesson lessonToEdit = null;
+    for (Lesson l : selectedCourse.getLessons()) {
+        if (l.getLessonId().equals(lessonId)) {
+            lessonToEdit = l;
+            break;
         }
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Please select a lesson to update.");
     }
+
+    if (lessonToEdit != null) {
+        lessonToEdit.setTitle(newTitle);
+        lessonToEdit.setContent(newContent);
+
+        dbManager.saveCourses();  // save changes
+        loadLessons(selectedCourse.getCourseId());  // reload table
+        javax.swing.JOptionPane.showMessageDialog(this, "Lesson updated successfully!");
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Failed to find the lesson.");
+    }
+} else {
+    javax.swing.JOptionPane.showMessageDialog(this, "Please select a lesson to update.");
+}
+
     }//GEN-LAST:event_UpdateButtonActionPerformed
+
+    private void txtCourseIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCourseIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCourseIdActionPerformed
+
+    private void LoadLessonsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadLessonsButtonActionPerformed
+       String courseId = txtCourseId.getText().trim();
+if (courseId.isEmpty()) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Course ID.");
+    return;
+}
+
+// Find the course by ID using CourseManager or add a method in dbManager
+selectedCourse = courseManager.getCourse(courseId); // Use CourseManager
+
+if (selectedCourse == null) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Course not found.");
+    tableModel.setRowCount(0); // clear table
+    return;
+}
+
+// Load lessons into table
+loadLessons(selectedCourse.getCourseId());
+    }//GEN-LAST:event_LoadLessonsButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,6 +327,7 @@ private void loadLessons() {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new InstructorLessonsFrame().setVisible(true);
             }
@@ -232,9 +339,11 @@ private void loadLessons() {
     private javax.swing.JButton CreateButton;
     private javax.swing.JButton DeleteButton;
     private javax.swing.JTable LessonsTable;
+    private javax.swing.JButton LoadLessonsButton;
     private javax.swing.JButton UpdateButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField txtCourseId;
     // End of variables declaration//GEN-END:variables
 }
