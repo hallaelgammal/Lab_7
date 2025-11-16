@@ -18,7 +18,13 @@ private Instructor user;
     /**
      * Creates new form InstructorCoursesFrame
      */
-    public InstructorCoursesFrame(Instructor user) {
+    public InstructorCoursesFrame() {
+    initComponents();
+    this.user = null; // or create a dummy instructor for testing
+}
+
+
+public InstructorCoursesFrame(Instructor user) {
     initComponents();
     this.user = user;
 
