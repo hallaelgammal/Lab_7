@@ -19,7 +19,7 @@ public class JsonDatabaseManager {
     private static final String COURSES_FILE = "courses.json";
 
     private ArrayList<User> users = new ArrayList<>();
-    private ArrayList<CourseManager> courses = new ArrayList<>();
+    private ArrayList<Course> courses = new ArrayList<>();
 
     // constructor loads everything 
     public JsonDatabaseManager() {
@@ -162,23 +162,23 @@ public class JsonDatabaseManager {
 
             JSONObject o = arr.getJSONObject(i);
 
-            int courseId = o.getInt("courseId");
+            String courseId = o.getString("courseId");
             String title = o.getString("title");
             String description = o.getString("description");
-            int instructorId = o.getInt("instructorId");
+            String instructorId = o.getString("instructorId");
 
-            Course c = new Course(courseId, title, description);
+            Course c = new Course(courseId, title, description, instructorId);
 
             JSONArray studentsArr = o.getJSONArray("students");
             for (int s = 0; s < studentsArr.length(); s++) {
-                c.getStudents().add(studentsArr.getInt(s));
+                c.getStudents().add(studentsArr.getString(s));
             }
 
             JSONArray lessonsArr = o.getJSONArray("lessons");
             for (int l = 0; l < lessonsArr.length(); l++) {
                 JSONObject lo = lessonsArr.getJSONObject(l);
 
-                LessonManager lesson = new Lesson(
+                Lesson lesson = new Lesson(
                         lo.getString("lessonId"),
                         lo.getString("title"),
                         lo.getString("content")
@@ -225,7 +225,7 @@ public class JsonDatabaseManager {
         return users;
     }
 
-    public ArrayList<CourseManager> getCourses() {
+    public ArrayList<Course> getCourses() {
         return courses;
     }
 
@@ -251,12 +251,15 @@ public class JsonDatabaseManager {
 
     public int generateCourseId() {
         int max = 0;
-        for (CourseManager c : courses) {
-            if (c.getId() > max) {
-                max = c.getId();
-            }
-        }
-        return max + 1;
+        for (Course c : courses) {
+            try {
+                int id = Integer.parseInt(c.getCourseId().replaceAll("\\D", ""));
+                if(id> max)
+                    max= id;
+            } catch(Exception e) {} 
+}
+return max +1;
+            
     }
 
     public void addUser(User u) {
@@ -264,7 +267,7 @@ public class JsonDatabaseManager {
         saveUsers();
     }
 
-    public void addCourse(CourseManager c) {
+    public void addCourse(Course c) {
         courses.add(c);
         saveCourses();
     }
