@@ -109,7 +109,7 @@ public class JsonDatabaseManager {
                     created.add(createdArr.getInt(j));
                 }
 
-                users.add(new Instructor(userId, username, email, passwordHash, created));
+                users.add(new Instructor(userId, username, email, passwordHash,created));
             }
         }
     }
