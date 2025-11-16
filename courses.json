@@ -4,7 +4,10 @@
         "students": [
             "S2",
             "939c5603-61ed-4f24-a0d8-bdf63b14ecb9",
-            "0"
+            "0",
+            "S1",
+            "S1",
+            "cdae56ae-bfc7-4f1d-8ef6-5873f4933135"
         ],
         "title": "Java Basics",
         "courseId": "C1",
@@ -26,7 +29,8 @@
         "description": "Introductory Python course",
         "students": [
             "S2",
-            "939c5603-61ed-4f24-a0d8-bdf63b14ecb9"
+            "939c5603-61ed-4f24-a0d8-bdf63b14ecb9",
+            "S1"
         ],
         "title": "Python Basics",
         "courseId": "C2",

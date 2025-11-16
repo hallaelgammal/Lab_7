@@ -1,7 +1,10 @@
 [
     {
         "role": "student",
-        "enrolledCourses": [],
+        "enrolledCourses": [
+            1,
+            2
+        ],
         "progress": {},
         "userId": "S1",
         "email": "hana.gamaleldin@gmail.com",
@@ -66,5 +69,14 @@
         "email": "y@gmail.com",
         "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
         "username": "yoyo"
+    },
+    {
+        "role": "student",
+        "enrolledCourses": [1],
+        "progress": {"1": ["L1"]},
+        "userId": "cdae56ae-bfc7-4f1d-8ef6-5873f4933135",
+        "email": "h@a",
+        "passwordHash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "username": "h"
     }
 ]

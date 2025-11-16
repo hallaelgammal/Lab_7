@@ -286,15 +286,44 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
     if (index < 0) return;
 
     List<Course> availableCourses = (List<Course>) listAvailable.getClientProperty("courses");
-    Course selected = availableCourses.get(index);
-
-    int id = Integer.parseInt(selected.getCourseId().replaceAll("\\D", ""));
-    if (!student.getEnrolledCourses().contains(id)) {
-        student.getEnrolledCourses().add(id);
-        selected.getStudents().add(student.getUserId());
+    Course selectedCourse = availableCourses.get(index);//*
+     Student realStudent = null;//*
+    for (User u : db.getUsers()) {
+        if (u instanceof Student s && s.getUserId().equals(student.getUserId())) {
+            realStudent = s;
+            break;
+        }
+    }
+    if (realStudent == null) {
+        JOptionPane.showMessageDialog(this, "Error: Student not found in database!");
+        return;
+    }
+    Course realCourse = null;
+    for (Course c : db.getCourses()) {
+        if (c.getCourseId().equals(selectedCourse.getCourseId())) {
+            realCourse = c;
+            break;
+        }
+    }
+    if (realCourse == null) {
+        JOptionPane.showMessageDialog(this, "Error: Course not found in database!");
+        return;
+    }//*
+    int courseIdInt = Integer.parseInt(realCourse.getCourseId().replaceAll("\\D", ""));
+    if (!realStudent.getEnrolledCourses().contains(courseIdInt)) {
+        realStudent.getEnrolledCourses().add(courseIdInt);
+        realCourse.getStudents().add(student.getUserId());
         db.saveUsers();
         db.saveCourses();
+        this.student = realStudent;
         refreshLists();
+         List<Course> enrolledCourses = (List<Course>) listEnrolled.getClientProperty("courses");//*
+        for (int i = 0; i < enrolledCourses.size(); i++) {
+            if (enrolledCourses.get(i).getCourseId().equals(realCourse.getCourseId())) {
+                listEnrolled.setSelectedIndex(i);
+                break;
+            }
+        }
     }
     }//GEN-LAST:event_btnEnrollActionPerformed
 
