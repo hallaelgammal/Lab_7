@@ -1,3 +1,7 @@
+
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -8,13 +12,59 @@
  * @author Gehad
  */
 public class InstructorCoursesFrame extends javax.swing.JFrame {
-
+private DefaultTableModel tableModel;
+private JsonDatabaseManager dbManager = new JsonDatabaseManager();
+private Instructor user;
     /**
      * Creates new form InstructorCoursesFrame
      */
-    public InstructorCoursesFrame() {
-        initComponents();
+    public InstructorCoursesFrame(Instructor user) {
+    initComponents();
+    this.user = user;
+
+    // 1️⃣ Initialize table model
+    tableModel = (DefaultTableModel) CoursesTable.getModel();
+
+    // Only set column identifiers if table has no columns yet
+    if (tableModel.getColumnCount() == 0) {
+        tableModel.setColumnIdentifiers(new String[]{"Course ID", "Title", "Description"});
     }
+
+    // 2️⃣ Add TableModelListener to detect edits
+    tableModel.addTableModelListener(e -> {
+        if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
+            int row = e.getFirstRow();
+            int col = e.getColumn();
+
+            String courseId = tableModel.getValueAt(row, 0).toString();
+            String newValue = tableModel.getValueAt(row, col).toString();
+
+            // Update the course in JsonDatabaseManager
+            for (Course c : dbManager.getCourses()) {
+                if (c.getCourseId().equals(courseId)) {
+                    if (col == 1) c.setTitle(newValue);
+                    if (col == 2) c.setDescription(newValue);
+                    dbManager.saveCourses();
+                    break;
+                }
+            }
+        }
+    });
+
+    // 3️⃣ Load courses into the table
+    loadCourses(user);
+}
+
+private void loadCourses(Instructor user) {
+    tableModel.setRowCount(0); // clear table
+    for (Course c : dbManager.getCourses()) {
+        if (c.getInstructorId().equals(user.getUserId())) {
+            tableModel.addRow(new Object[]{c.getCourseId(), c.getTitle(), c.getDescription()});
+        }
+    }
+}
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -25,21 +75,157 @@ public class InstructorCoursesFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        CoursesTable = new javax.swing.JTable();
+        CreateButton = new javax.swing.JButton();
+        UpdateButton = new javax.swing.JButton();
+        DeleteButton = new javax.swing.JButton();
+        BackButton = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI Light", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("==Manage Your Courses==");
+
+        CoursesTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Course ID", "Title", "Description"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        CoursesTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CoursesTableMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(CoursesTable);
+
+        CreateButton.setText("Create");
+        CreateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CreateButtonActionPerformed(evt);
+            }
+        });
+
+        UpdateButton.setText("Update");
+        UpdateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UpdateButtonActionPerformed(evt);
+            }
+        });
+
+        DeleteButton.setText("Delete");
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteButtonActionPerformed(evt);
+            }
+        });
+
+        BackButton.setText("Back");
+        BackButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BackButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(CreateButton)
+                .addGap(30, 30, 30)
+                .addComponent(UpdateButton)
+                .addGap(29, 29, 29)
+                .addComponent(DeleteButton)
+                .addGap(30, 30, 30)
+                .addComponent(BackButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(CreateButton)
+                    .addComponent(UpdateButton)
+                    .addComponent(DeleteButton)
+                    .addComponent(BackButton))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
+    String courseId = String.valueOf(dbManager.generateCourseId());
+    Course newCourse = new Course(courseId, "", "", user.getUserId());
+    dbManager.addCourse(newCourse);
+
+    loadCourses(user); // refresh table
+    }//GEN-LAST:event_CreateButtonActionPerformed
+
+    private void CoursesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CoursesTableMouseClicked
+        int row = CoursesTable.getSelectedRow();
+if (row >= 0) {
+    String courseId = tableModel.getValueAt(row, 0).toString();
+    String title = tableModel.getValueAt(row, 1).toString();
+    String desc = tableModel.getValueAt(row, 2).toString();
+    
+    // Optionally, show details in text fields if you have them
+}
+    }//GEN-LAST:event_CoursesTableMouseClicked
+
+    private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
+      int row = CoursesTable.getSelectedRow();
+    if (row >= 0) {
+        CoursesTable.setRowSelectionInterval(row, row);
+        JOptionPane.showMessageDialog(this, "You can now edit the Title and Description directly in the table.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a course to edit.");
+    }
+    }//GEN-LAST:event_UpdateButtonActionPerformed
+
+    private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
+       int row = CoursesTable.getSelectedRow();
+    if (row >= 0) {
+        String courseId = tableModel.getValueAt(row, 0).toString();
+        dbManager.getCourses().removeIf(c -> c.getCourseId().equals(courseId));
+        dbManager.saveCourses();
+        loadCourses(user);
+    }
+    }//GEN-LAST:event_DeleteButtonActionPerformed
+
+    private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
+        // Close current frame
+    this.dispose();
+
+    // Open Instructor Dashboard
+    InstructorDashboardFrame dashboard = new InstructorDashboardFrame(user);
+    dashboard.setVisible(true);
+    }//GEN-LAST:event_BackButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -70,6 +256,7 @@ public class InstructorCoursesFrame extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new InstructorCoursesFrame().setVisible(true);
             }
@@ -77,5 +264,12 @@ public class InstructorCoursesFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BackButton;
+    private javax.swing.JTable CoursesTable;
+    private javax.swing.JButton CreateButton;
+    private javax.swing.JButton DeleteButton;
+    private javax.swing.JButton UpdateButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
