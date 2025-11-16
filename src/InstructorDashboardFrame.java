@@ -8,6 +8,7 @@
  * @author Gehad
  */
 public class InstructorDashboardFrame extends javax.swing.JFrame {
+private User user;  // or Instructor user; depending on your class
 
     /**
      * Creates new form InstructorDashboardFrame
@@ -16,6 +17,12 @@ public class InstructorDashboardFrame extends javax.swing.JFrame {
         initComponents();
     }
 
+    public InstructorDashboardFrame(User user) {
+        this.user = user;        // store the logged-in user
+        initComponents();         // initialize UI
+
+       
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
