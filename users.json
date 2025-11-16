@@ -1,0 +1,20 @@
+[
+    {
+        "role": "student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "dccf534e-5fe8-4e91-a7f3-fdc66ca8080b",
+        "email": "halla@gmail",
+        "passwordHash": "7c302b703fe750c414e13239c7eef255f1b0d4417699249f3837de7f14a6a301",
+        "username": "halla"
+    },
+    {
+        "role": "student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "0ee063e9-d625-4299-be65-1816b4b361c6",
+        "email": "hallaayman@gmail",
+        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "username": "hallaayman"
+    }
+]

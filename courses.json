@@ -1,0 +1,40 @@
+[
+    {
+        "description": "Introductory Java course",
+        "students": ["0ee063e9-d625-4299-be65-1816b4b361c6"],
+        "title": "Java Basics",
+        "courseId": "C1",
+        "instructorId": "T1",
+        "lessons": [
+            {
+                "lessonId": "L1",
+                "title": "What is Java?",
+                "content": "Java introduction."
+            },
+            {
+                "lessonId": "L2",
+                "title": "Variables",
+                "content": "Types and variables."
+            }
+        ]
+    },
+    {
+        "description": "Object Oriented Programming",
+        "students": ["0ee063e9-d625-4299-be65-1816b4b361c6"],
+        "title": "OOP",
+        "courseId": "C2",
+        "instructorId": "T2",
+        "lessons": [
+            {
+                "lessonId": "L1",
+                "title": "Classes",
+                "content": "Definition of classes."
+            },
+            {
+                "lessonId": "L2",
+                "title": "Inheritance",
+                "content": "Extending classes."
+            }
+        ]
+    }
+]
