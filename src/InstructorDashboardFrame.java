@@ -129,6 +129,7 @@ private User user;  // or Instructor user; depending on your class
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new InstructorDashboardFrame().setVisible(true);
             }
