@@ -47,7 +47,7 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
         this.setVisible(true);
     }
      
-     public StudentDashboardFrame() {
+     public StudentDashboardFrame() {   // bla
     this(new Student(
             "0",                // fake ID
             "Test Student",     // fake name
