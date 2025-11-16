@@ -17,31 +17,31 @@ public class CourseManager {
         this.db = db;
     }
 
+    // Generate a new course ID based on the number of existing courses
     private String generateCourseId() {
-        ArrayList<CourseManager> courses = db.getCourses();
+        ArrayList<Course> courses = db.getCourses();
         return "C" + (courses.size() + 1);
     }
 
+    // Add a new course
     public Course addCourse(String title, String description, String instructorId) {
         if (title == null || title.trim().isEmpty()) 
             return null;
 
-        ArrayList<CourseManager> courses = db.getCourses();
-
-        
+        ArrayList<Course> courses = db.getCourses();
         if (courses == null) {
             courses = new ArrayList<>();
         }
 
-        
         Course c = new Course(generateCourseId(), title, description, instructorId);
         courses.add(c);  
         db.saveCourses();   
         return c;
     }
 
+    // Edit an existing course
     public boolean editCourse(String id, String newTitle, String newDescription) {
-        CourseManager c = getCourse(id);
+        Course c = getCourse(id);
         if (c == null) 
             return false;
 
@@ -55,39 +55,40 @@ public class CourseManager {
         return true;
     }
 
+    // Delete a course
     public boolean deleteCourse(String id) {
-        ArrayList<CourseManager> courses = db.getCourses();
-        CourseManager c = getCourse(id);
+        ArrayList<Course> courses = db.getCourses();
+        Course c = getCourse(id);
         if (c == null)
             return false;
 
         courses.remove(c);  
         db.saveCourses();
-
         return true;
     }
 
-    public CourseManager getCourse(String id) {
-        for (CourseManager c : db.getCourses()) {
+    // Get a course by ID
+    public Course getCourse(String id) {
+        for (Course c : db.getCourses()) {
             if (c.getCourseId().equals(id)) 
                 return c;
         }
         return null;
     }
 
-    public ArrayList<CourseManager> getAllCourses() {
+    // Get all courses
+    public ArrayList<Course> getAllCourses() {
         return db.getCourses();  
     }
 
-    private Object getCourseId() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    // Enroll a student in a course
+    public boolean enrollStudent(String courseId, String studentId) {
+        Course c = getCourse(courseId);
+        if (c == null) return false;
 
-    private void setTitle(String newTitle) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    private void setDescription(String newDescription) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (c.getStudents().contains(studentId)) return false; // already enrolled
+        c.getStudents().add(studentId);
+        db.saveCourses();
+        return true;
     }
 }
