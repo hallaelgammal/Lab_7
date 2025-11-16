@@ -11,81 +11,53 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Gehad
  */
+
 public class InstructorCoursesFrame extends javax.swing.JFrame {
-private DefaultTableModel tableModel;
-private JsonDatabaseManager dbManager = new JsonDatabaseManager();
-private Instructor instructor;
+
+    private DefaultTableModel tableModel;
+    private JsonDatabaseManager dbManager;
+
     /**
      * Creates new form InstructorCoursesFrame
      */
     public InstructorCoursesFrame() {
-    initComponents();
-    this.instructor = null; // or create a dummy instructor for testing
-}
+        initComponents();
+tableModel = (DefaultTableModel) CoursesTable.getModel();
+
+        // Initialize database manager
+        dbManager = new JsonDatabaseManager();
 
 
-public InstructorCoursesFrame(User user) {
-    initComponents();
-
-    if (user instanceof Instructor) {
-        this.instructor = (Instructor) user;
-    } else {
-        JOptionPane.showMessageDialog(this, "Error: Logged-in user is not an instructor!");
-        dispose();
-        return;
-    }
-
-    // Initialize table model after initComponents
-    tableModel = (DefaultTableModel) CoursesTable.getModel();
-
-    // Optional: only set columns if table has none
-    if (tableModel.getColumnCount() == 0) {
-        tableModel.setColumnIdentifiers(new String[]{"Course ID", "Title", "Description"});
-    }
-
-    // Add listener to detect edits
-    tableModel.addTableModelListener(e -> {
-        if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
-            int row = e.getFirstRow();
-            int col = e.getColumn();
-
-            DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
-            String courseId = model.getValueAt(row, 0).toString();
-            String newValue = model.getValueAt(row, col).toString();
-
-            // Update backend
-            for (Course c : dbManager.getCourses()) {
-                if (c.getCourseId().equals(courseId)) {
-                    if (col == 1) c.setTitle(newValue);
-                    if (col == 2) c.setDescription(newValue);
-                    dbManager.saveCourses();
-                    break;
-                }
-            }
+        // Optional: set column headers if table has none
+        if (tableModel.getColumnCount() == 0) {
+            tableModel.setColumnIdentifiers(new String[]{"Course ID", "Title", "Description"});
         }
-    });
 
-   dbManager = new JsonDatabaseManager();
-loadCourses(instructor);
+        // Load all courses
+        loadCourses();
+    }
 
-}
+    /**
+     * Loads all courses from the database into the table
+     */
+    private void loadCourses() {
+        DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
+        model.setRowCount(0); // Clear existing rows
 
-
-private void loadCourses(Instructor instructor) {
-    DefaultTableModel model = (DefaultTableModel) CoursesTable.getModel();
-    model.setRowCount(0);  // Clear table first
-
-    for (Course c : dbManager.getCourses()) {
-        if (c.getInstructorId().equals(instructor.getUserId())) {
+        for (Course c : dbManager.getCourses()) {
             model.addRow(new Object[]{
-                c.getCourseId(),
-                c.getTitle(),
-                c.getDescription()
+                    c.getCourseId(),
+                    c.getTitle(),
+                    c.getDescription()
             });
         }
+        addExtraRows(5);
+    }
+private void addExtraRows(int extraRows) {
+    for (int i = 0; i < extraRows; i++) {
+        tableModel.addRow(new Object[]{"", "", ""}); // ID blank for new lessons
     }
 }
-
 
 
 
@@ -203,13 +175,33 @@ private void loadCourses(Instructor instructor) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
-    String courseId = String.valueOf(dbManager.generateCourseId());
-    Course newCourse = new Course(courseId, "", "", instructor.getUserId());
-    dbManager.addCourse(newCourse);
+    int rowCount = tableModel.getRowCount();
+    boolean added = false;
 
-    loadCourses(instructor); // refresh table
+    for (int row = 0; row < rowCount; row++) {
+        String courseIdCell = (tableModel.getValueAt(row, 0) != null) ? tableModel.getValueAt(row, 0).toString() : "";
+        String titleCell = (tableModel.getValueAt(row, 1) != null) ? tableModel.getValueAt(row, 1).toString().trim() : "";
+
+        // Find the first empty row where title is filled but ID is empty
+        if (courseIdCell.isEmpty() && !titleCell.isEmpty()) {
+            // Generate new courseId
+            String courseId = "C" + dbManager.generateCourseId();
+
+            // Get description (can be empty)
+            String description = (tableModel.getValueAt(row, 2) != null) ? tableModel.getValueAt(row, 2).toString() : "";
+
+            // Create course object and save to DB
+            Course newCourse = new Course(courseId, titleCell, description, "");
+            dbManager.addCourse(newCourse);
+
+            // Update table with generated ID
+            tableModel.setValueAt(courseId, row, 0);
+
+            added = true;
+            break; // only fill one row per click
+        }
     }//GEN-LAST:event_CreateButtonActionPerformed
-
+    }
     private void CoursesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CoursesTableMouseClicked
        int row = CoursesTable.getSelectedRow();
 if (row >= 0) {
@@ -230,23 +222,43 @@ if (row >= 0) {
     }//GEN-LAST:event_CoursesTableMouseClicked
 
     private void UpdateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpdateButtonActionPerformed
-      int row = CoursesTable.getSelectedRow();
-    if (row >= 0) {
-        CoursesTable.setRowSelectionInterval(row, row);
-        JOptionPane.showMessageDialog(this, "You can now edit the Title and Description directly in the table.");
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a course to edit.");
+int rowCount = tableModel.getRowCount();
+
+    for (int row = 0; row < rowCount; row++) {
+        String courseId = tableModel.getValueAt(row, 0).toString();
+        String newTitle = tableModel.getValueAt(row, 1).toString();
+        String newDescription = tableModel.getValueAt(row, 2).toString();
+
+        // Find course in the database
+        Course course = null;
+        for (Course c : dbManager.getCourses()) {
+            if (c.getCourseId().equals(courseId)) {
+                course = c;
+                break;
+            }
+        }
+        if (course != null) {
+            course.setTitle(newTitle);
+            course.setDescription(newDescription);
+        }
     }
+
+    // Save all changes to JSON
+    dbManager.saveCourses();
+    JOptionPane.showMessageDialog(this, "Courses updated successfully!");
     }//GEN-LAST:event_UpdateButtonActionPerformed
 
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteButtonActionPerformed
-       int row = CoursesTable.getSelectedRow();
-    if (row >= 0) {
-        String courseId = tableModel.getValueAt(row, 0).toString();
-        dbManager.getCourses().removeIf(c -> c.getCourseId().equals(courseId));
-        dbManager.saveCourses();
-        loadCourses(instructor);
+        int selectedRow = CoursesTable.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a course to delete.");
+        return;
     }
+
+    String courseId = tableModel.getValueAt(selectedRow, 0).toString();
+    dbManager.getCourses().removeIf(c -> c.getCourseId().equals(courseId));
+    dbManager.saveCourses();
+    tableModel.removeRow(selectedRow);
     }//GEN-LAST:event_DeleteButtonActionPerformed
 
     private void BackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackButtonActionPerformed
@@ -254,7 +266,7 @@ if (row >= 0) {
     this.dispose();
 
     // Open Instructor Dashboard
-    InstructorDashboardFrame dashboard = new InstructorDashboardFrame(instructor);
+    InstructorDashboardFrame dashboard = new InstructorDashboardFrame();
     dashboard.setVisible(true);
     }//GEN-LAST:event_BackButtonActionPerformed
 
