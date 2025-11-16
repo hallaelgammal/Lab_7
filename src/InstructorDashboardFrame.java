@@ -8,7 +8,7 @@
  * @author Gehad
  */
 public class InstructorDashboardFrame extends javax.swing.JFrame {
-private User user;  // or Instructor user; depending on your class
+private Instructor user;  // or Instructor user; depending on your class
 
     /**
      * Creates new form InstructorDashboardFrame
@@ -17,7 +17,7 @@ private User user;  // or Instructor user; depending on your class
         initComponents();
     }
 
-    public InstructorDashboardFrame(User user) {
+    public InstructorDashboardFrame(Instructor user) {
         this.user = user;        // store the logged-in user
         initComponents();         // initialize UI
 
@@ -97,7 +97,7 @@ private User user;  // or Instructor user; depending on your class
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       new InstructorCoursesFrame().setVisible(true);
+       new InstructorCoursesFrame(user).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
