@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -21,6 +22,7 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
     /**
      * Creates new form StudentDashboardFrame
      */
+   
      public StudentDashboardFrame(User user) {
         initComponents(); // NetBeans GUI builder
 
@@ -44,6 +46,17 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
+     
+     public StudentDashboardFrame() {
+    this(new Student(
+            "0",                // fake ID
+            "Test Student",     // fake name
+            "test@email.com",
+            "123",
+            new ArrayList<>(),  // empty enrolled courses
+            new HashMap<>()     // empty progress
+    ));
+}
     
     private void refreshLists()
     {
