@@ -57,5 +57,14 @@
         "email": "h@gmail.com",
         "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
         "username": "bibaa"
+    },
+    {
+        "role": "student",
+        "enrolledCourses": [],
+        "progress": {},
+        "userId": "939c5603-61ed-4f24-a0d8-bdf63b14ecb9",
+        "email": "y@gmail.com",
+        "passwordHash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "username": "yoyo"
     }
 ]
