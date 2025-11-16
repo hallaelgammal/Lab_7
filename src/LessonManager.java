@@ -7,120 +7,59 @@
  *
  * @author New Eng
  */
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class LessonManager {
 
-    public static class Lesson {
-        private int id;
-        private String title;
-        private String content;
-
-        public Lesson(int id, String title, String content) {
-            this.id = id;
-            this.title = title;
-            this.content = content;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        @Override
-        public String toString() { //3shan lama agy a3ml print
-            return id + ": " + title + " - " + content;
-        }
+    private String generateLessonId(Course course) {
+        int next = course.getLessons().size() + 1;
+        return "L" + next;
     }
 
-    
-    private final List<CourseLessons> coursesLessons = new ArrayList<>();
+    public Lesson addLesson(Course course, String title, String content) {
+        if (course == null || title == null || title.trim().isEmpty())
+            return null;
 
+        Lesson lesson = new Lesson(
+                generateLessonId(course),
+                title,
+                content
+        );
 
-    private static class CourseLessons {
-        int courseId;
-        List<Lesson> lessons = new ArrayList<>();
-        int nextLessonId = 1;
-
-        CourseLessons(int courseId) {
-            this.courseId = courseId;
-        }
-    }
-
-    private CourseLessons getCourseLessons(int courseId) {
-        for (CourseLessons cl : coursesLessons) {
-            if (cl.courseId == courseId) return cl;
-        }
-        return null;
-    }
-
-    
-    public Lesson addLesson(int courseId, String title, String content) {
-        if (title == null || title.trim().isEmpty()) return null;
-
-        CourseLessons cl = getCourseLessons(courseId);
-        if (cl == null) {
-            cl = new CourseLessons(courseId);
-            coursesLessons.add(cl);
-        }
-
-        Lesson lesson = new Lesson(cl.nextLessonId++, title, content);
-        cl.lessons.add(lesson);
+        course.getLessons().add(lesson);
         return lesson;
     }
 
-    public boolean editLesson(int courseId, int lessonId, String newTitle, String newContent) {
-        CourseLessons cl = getCourseLessons(courseId);
-        if (cl == null) return false;
+    public boolean editLesson(Course course, String lessonId, String newTitle, String newContent) {
+        if (course == null) return false;
 
-        for (Lesson l : cl.lessons) {
-            if (l.getId() == lessonId) {
-                if (newTitle != null && !newTitle.trim().isEmpty()) l.setTitle(newTitle);
-                if (newContent != null && !newContent.trim().isEmpty()) l.setContent(newContent);
-                return true;
-            }
-        }
-        return false;
+        Lesson lesson = getLesson(course, lessonId);
+        if (lesson == null) return false;
+
+        if (newTitle != null && !newTitle.isEmpty()) lesson.setTitle(newTitle);
+        if (newContent != null && !newContent.isEmpty()) lesson.setContent(newContent);
+
+        return true;
     }
 
-    public boolean deleteLesson(int courseId, int lessonId) {
-        CourseLessons cl = getCourseLessons(courseId);
-        if (cl == null) return false;
-
-        return cl.lessons.removeIf(l -> l.getId() == lessonId);
+    public boolean deleteLesson(Course course, String lessonId) {
+        if (course == null) return false;
+        return course.getLessons().removeIf(l -> l.getLessonId().equals(lessonId));
     }
 
- 
-    public Lesson getLesson(int courseId, int lessonId) {
-        CourseLessons cl = getCourseLessons(courseId);
-        if (cl == null) return null;
+    public Lesson getLesson(Course course, String lessonId) {
+        if (course == null) return null;
 
-        for (Lesson l : cl.lessons) {
-            if (l.getId() == lessonId) return l;
+        for (Lesson l : course.getLessons()) {
+            if (l.getLessonId().equals(lessonId)) return l;
         }
         return null;
     }
 
-    public List<Lesson> getAllLessons(int courseId) {
-        CourseLessons cl = getCourseLessons(courseId);
-        if (cl == null) return new ArrayList<>();
-        return cl.lessons;
+    public List<Lesson> getAllLessons(Course course) {
+        if (course == null) return List.of();
+        return course.getLessons();
     }
 }
 
