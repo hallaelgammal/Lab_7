@@ -1,3 +1,6 @@
+
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -8,8 +11,8 @@
  * @author Gehad
  */
 public class InstructorDashboardFrame extends javax.swing.JFrame {
-private Instructor user;  // or Instructor user; depending on your class
-
+private User user;  // or Instructor user; depending on your class
+private Instructor instructor;
     /**
      * Creates new form InstructorDashboardFrame
      */
@@ -17,10 +20,15 @@ private Instructor user;  // or Instructor user; depending on your class
         initComponents();
     }
 
-    public InstructorDashboardFrame(Instructor user) {
-        this.user = user;        // store the logged-in user
+    public InstructorDashboardFrame(User user) {
         initComponents();         // initialize UI
-
+if (user instanceof Instructor) {
+            this.instructor = (Instructor) user;
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Logged-in user is not a instructor!");
+            dispose();
+            return;
+        }
        
     }
     /**

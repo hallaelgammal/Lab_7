@@ -14,20 +14,25 @@ import javax.swing.table.DefaultTableModel;
 public class InstructorCoursesFrame extends javax.swing.JFrame {
 private DefaultTableModel tableModel;
 private JsonDatabaseManager dbManager = new JsonDatabaseManager();
-private Instructor user;
+private Instructor instructor;
     /**
      * Creates new form InstructorCoursesFrame
      */
     public InstructorCoursesFrame() {
     initComponents();
-    this.user = null; // or create a dummy instructor for testing
+    this.instructor = null; // or create a dummy instructor for testing
 }
 
 
-public InstructorCoursesFrame(Instructor user) {
+public InstructorCoursesFrame(User user) {
     initComponents();
-    this.user = user;
-
+if (user instanceof Instructor) {
+            this.instructor = (Instructor) user;
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Logged-in user is not a instructor!");
+            dispose();
+            return;
+        }
     // 1️⃣ Initialize table model
     tableModel = (DefaultTableModel) CoursesTable.getModel();
 
@@ -58,7 +63,7 @@ public InstructorCoursesFrame(Instructor user) {
     });
 
     // 3️⃣ Load courses into the table
-    loadCourses(user);
+    loadCourses(instructor);
 }
 
 private void loadCourses(Instructor user) {
@@ -187,10 +192,10 @@ private void loadCourses(Instructor user) {
 
     private void CreateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CreateButtonActionPerformed
     String courseId = String.valueOf(dbManager.generateCourseId());
-    Course newCourse = new Course(courseId, "", "", user.getUserId());
+    Course newCourse = new Course(courseId, "", "", instructor.getUserId());
     dbManager.addCourse(newCourse);
 
-    loadCourses(user); // refresh table
+    loadCourses(instructor); // refresh table
     }//GEN-LAST:event_CreateButtonActionPerformed
 
     private void CoursesTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CoursesTableMouseClicked
@@ -220,7 +225,7 @@ if (row >= 0) {
         String courseId = tableModel.getValueAt(row, 0).toString();
         dbManager.getCourses().removeIf(c -> c.getCourseId().equals(courseId));
         dbManager.saveCourses();
-        loadCourses(user);
+        loadCourses(instructor);
     }
     }//GEN-LAST:event_DeleteButtonActionPerformed
 
@@ -229,7 +234,7 @@ if (row >= 0) {
     this.dispose();
 
     // Open Instructor Dashboard
-    InstructorDashboardFrame dashboard = new InstructorDashboardFrame(user);
+    InstructorDashboardFrame dashboard = new InstructorDashboardFrame(instructor);
     dashboard.setVisible(true);
     }//GEN-LAST:event_BackButtonActionPerformed
 
