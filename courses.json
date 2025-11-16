@@ -1,10 +1,14 @@
 [
     {
-        "courseId": "C1",
-        "title": "Java Basics",
         "description": "Introductory Java course",
+        "students": [
+            "S2",
+            "939c5603-61ed-4f24-a0d8-bdf63b14ecb9",
+            "0"
+        ],
+        "title": "Java Basics",
+        "courseId": "C1",
         "instructorId": "I1",
-        "students": ["S2"],
         "lessons": [
             {
                 "lessonId": "L1",
@@ -19,17 +23,18 @@
         ]
     },
     {
-        "courseId": "C2",
-        "title": "Python Basics",
         "description": "Introductory Python course",
+        "students": [
+            "S2",
+            "939c5603-61ed-4f24-a0d8-bdf63b14ecb9"
+        ],
+        "title": "Python Basics",
+        "courseId": "C2",
         "instructorId": "I2",
-        "students": ["S2"],
-        "lessons": [
-            {
-                "lessonId": "L1",
-                "title": "Python Variables",
-                "content": "Introduction to variables in Python"
-            }
-        ]
+        "lessons": [{
+            "lessonId": "L1",
+            "title": "Python Variables",
+            "content": "Introduction to variables in Python"
+        }]
     }
 ]

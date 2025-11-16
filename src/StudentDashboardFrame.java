@@ -42,6 +42,11 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
 
         // load lists
         refreshLists();
+        listEnrolled.addListSelectionListener(e -> {
+    if (!e.getValueIsAdjusting()) {
+        updateLessonsList();
+    }
+});
 
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -58,36 +63,66 @@ public class StudentDashboardFrame extends javax.swing.JFrame {
     ));
 }
     
-    private void refreshLists()
-    {
-   List<String> availableNames = new ArrayList<>();
-        List<Course> availableCourses = new ArrayList<>();
+    private void refreshLists() {
+    List<String> availableNames = new ArrayList<>();
+    List<Course> availableCourses = new ArrayList<>();
+    List<String> enrolledNames = new ArrayList<>();
+    List<Course> enrolledCourses = new ArrayList<>();
 
-        // ba prepare el enrolled courses list
-        List<String> enrolledNames = new ArrayList<>();
-        List<Course> enrolledCourses = new ArrayList<>();
-
-        for (Course c : db.getCourses()) {
-            int id = Integer.parseInt(c.getCourseId().replaceAll("\\D", ""));
-            if (student.getEnrolledCourses().contains(id)) {
-                enrolledNames.add(c.getTitle());
-                enrolledCourses.add(c);
-            } else {
-                availableNames.add(c.getTitle());
-                availableCourses.add(c);
-            }
+    for (Course c : db.getCourses()) {
+        int id = Integer.parseInt(c.getCourseId().replaceAll("\\D", ""));
+        if (student.getEnrolledCourses().contains(id)) {
+            enrolledNames.add(c.getTitle());
+            enrolledCourses.add(c);
+        } else {
+            availableNames.add(c.getTitle());
+            availableCourses.add(c);
         }
+    }
 
-        // store courses in client properties for retrieval later
-        listAvailable.putClientProperty("courses", availableCourses);
-        listEnrolled.putClientProperty("courses", enrolledCourses);
+    listAvailable.putClientProperty("courses", availableCourses);
+    listEnrolled.putClientProperty("courses", enrolledCourses);
 
-        // set list data
-        listAvailable.setListData(availableNames.toArray(new String[0]));
-        listEnrolled.setListData(enrolledNames.toArray(new String[0]));
+    listAvailable.setListData(availableNames.toArray(new String[0]));
+    listEnrolled.setListData(enrolledNames.toArray(new String[0]));
 
+    // select first enrolled course to auto-update lessons
+    if (!enrolledCourses.isEmpty()) {
+        listEnrolled.setSelectedIndex(0);
+    } else {
         listLessons.setListData(new String[0]);
     }
+}
+    
+    private void updateLessonsList() {
+    int index = listEnrolled.getSelectedIndex();
+    if (index < 0) {
+        listLessons.setListData(new String[0]);
+        listLessons.putClientProperty("lessons", null);
+        return;
+    }
+
+    List<Course> enrolledCourses = (List<Course>) listEnrolled.getClientProperty("courses");
+    if (enrolledCourses == null || enrolledCourses.isEmpty()) return;
+
+    Course selectedCourse = enrolledCourses.get(index);
+
+    int courseIdInt = Integer.parseInt(selectedCourse.getCourseId().replaceAll("\\D", ""));
+    List<String> completed = student.getProgress().get(courseIdInt);
+
+    List<String> lessonNames = new ArrayList<>();
+    for (Lesson l : selectedCourse.getLessons()) {
+        String title = (completed != null && completed.contains(l.getLessonId()))
+                ? "[✓] " + l.getTitle()
+                : l.getTitle();
+        lessonNames.add(title);
+    }
+
+    listLessons.setListData(lessonNames.toArray(new String[0]));
+    listLessons.putClientProperty("lessons", selectedCourse.getLessons());
+}
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
