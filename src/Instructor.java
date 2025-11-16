@@ -4,80 +4,109 @@
  */
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Instructor extends User {
 
-    private ArrayList<Integer> createdCourses; // IDs of courses this instructor created
-    private ArrayList<Integer> createdLessons; // IDs of lessons this instructor created
+    private ArrayList<String> createdCourses;   
+    private ArrayList<String> createdLessons;   
 
-    // Constructor
-    public Instructor(String userId, String username, String email, String passwordHash, ArrayList<Integer> createdCourses) {
+    // Constructor when loading from database
+    public Instructor(String userId, String username, String email, String passwordHash,
+                      ArrayList<String> createdCourses) {
+
         super(userId, Role.INSTRUCTOR, username, email, passwordHash);
         this.createdCourses = (createdCourses != null) ? createdCourses : new ArrayList<>();
         this.createdLessons = new ArrayList<>();
     }
-// Constructor for new instructors 
-public Instructor(String userId, String username, String email, String passwordHash) {
-    super(userId, Role.INSTRUCTOR, username, email, passwordHash);
-    this.createdCourses = new ArrayList<>();
-    this.createdLessons = new ArrayList<>();
-}
 
-    public int addCourse(CourseManager manager, String title, String description) {
-        CourseManager.Course course = manager.addCourse(title, description);
-        if (course != null) {
-            createdCourses.add(course.getId());
-            return course.getId();
+    // Constructor for new instructors
+    public Instructor(String userId, String username, String email, String passwordHash) {
+        super(userId, Role.INSTRUCTOR, username, email, passwordHash);
+        this.createdCourses = new ArrayList<>();
+        this.createdLessons = new ArrayList<>();
+    }
+    public String addCourse(CourseManager manager, String title, String description) {
+        Course c = manager.addCourse(title, description, this.getUserId());
+        if (c != null) {
+            createdCourses.add(c.getCourseId());
+            return c.getCourseId();
         }
-        return -1;
+        return null;
     }
 
-    public boolean editCourse(CourseManager manager, int courseId, String newTitle, String newDescription) {
+    public boolean editCourse(CourseManager manager, String courseId, String newTitle, String newDescription) {
         if (!createdCourses.contains(courseId)) return false;
         return manager.editCourse(courseId, newTitle, newDescription);
     }
 
-    public boolean deleteCourse(CourseManager manager, int courseId) {
+    public boolean deleteCourse(CourseManager manager, String courseId) {
         if (!createdCourses.contains(courseId)) return false;
+
         boolean deleted = manager.deleteCourse(courseId);
-        if (deleted) createdCourses.remove(Integer.valueOf(courseId));
-        return deleted;
-    }
-
-    public int addLesson(LessonManager manager, int courseId, String title, String content) {
-        if (!createdCourses.contains(courseId)) return -1; // can only add lessons to own courses
-        LessonManager.Lesson lesson = manager.addLesson(courseId, title, content);
-        if (lesson != null) {
-            createdLessons.add(lesson.getId());
-            return lesson.getId();
+        if (deleted) {
+            createdCourses.remove(courseId);
         }
-        return -1;
-    }
-
-    public boolean editLesson(LessonManager manager, int courseId, int lessonId, String newTitle, String newContent) {
-        if (!createdLessons.contains(lessonId)) return false;
-        return manager.editLesson(courseId, lessonId, newTitle, newContent);
-    }
-
-    public boolean deleteLesson(LessonManager manager, int courseId, int lessonId) {
-        if (!createdLessons.contains(lessonId)) return false;
-        boolean deleted = manager.deleteLesson(courseId, lessonId);
-        if (deleted) createdLessons.remove(Integer.valueOf(lessonId));
         return deleted;
     }
 
-    public ArrayList<String> viewEnrolledStudents(CourseManager manager, int courseId) {
+    public String addLesson(LessonManager manager, CourseManager courseManager,
+                            String courseId, String title, String content) {
+
         if (!createdCourses.contains(courseId)) return null;
-        CourseManager.Course course = manager.getCourse(courseId);
-        if (course != null) return course.getEnrolledStudents();
+
+        Course course = courseManager.getCourse(courseId);
+        if (course == null) return null;
+
+        Lesson lesson = manager.addLesson(course, title, content);
+        if (lesson != null) {
+            createdLessons.add(lesson.getLessonId());
+            return lesson.getLessonId();
+        }
         return null;
     }
 
-    public ArrayList<Integer> getCreatedCourses() {
+    public boolean editLesson(LessonManager manager, CourseManager courseManager,
+                              String courseId, String lessonId,
+                              String newTitle, String newContent) {
+
+        if (!createdLessons.contains(lessonId)) return false;
+
+        Course course = courseManager.getCourse(courseId);
+        if (course == null) return false;
+
+        return manager.editLesson(course, lessonId, newTitle, newContent);
+    }
+
+    public boolean deleteLesson(LessonManager manager, CourseManager courseManager,
+                                String courseId, String lessonId) {
+
+        if (!createdLessons.contains(lessonId)) return false;
+
+        Course course = courseManager.getCourse(courseId);
+        if (course == null) return false;
+
+        boolean deleted = manager.deleteLesson(course, lessonId);
+        if (deleted) {
+            createdLessons.remove(lessonId);
+        }
+        return deleted;
+    }
+    
+    public List<String> viewEnrolledStudents(CourseManager manager, String courseId) {
+        if (!createdCourses.contains(courseId)) return null;
+
+        Course c = manager.getCourse(courseId);
+        if (c == null) return null;
+
+        return new ArrayList<>(c.getStudents());
+    }
+
+    public ArrayList<String> getCreatedCourses() {
         return createdCourses;
     }
 
-    public ArrayList<Integer> getCreatedLessons() {
+    public ArrayList<String> getCreatedLessons() {
         return createdLessons;
     }
 }
